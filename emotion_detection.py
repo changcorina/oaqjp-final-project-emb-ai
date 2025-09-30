@@ -1,5 +1,5 @@
-# Import the requests library to handle HTTP requests
 import requests  
+import json
 
 def emotion_detector(text_to_analyse): 
      # URL of the emotion detector service
@@ -14,5 +14,19 @@ def emotion_detector(text_to_analyse):
     # Send a POST request to the API with the text and headers
     response = requests.post(url, json = myobj, headers=header) 
 
-    # Return the response text from the API 
-    return response.text  
+    # Parsing the JSON response from the API
+    formatted_response = json.loads(response.text)
+
+    # Extract emotions and their scores
+    emotions_data = formatted_response["emotionPredictions"][0]["emotion"]
+    emotions = {
+        "anger": emotions_data["anger"],
+        "disgust": emotions_data["disgust"],
+        "fear": emotions_data["fear"],
+        "joy": emotions_data["joy"],
+        "sadness": emotions_data["sadness"],
+        "dominant_emotion": max(["anger", "disgust", "fear", "joy", "sadness"],
+                            key=lambda x: emotions_data[x])
+    }
+
+    return emotions
